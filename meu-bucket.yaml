@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Template básico para criar um bucket S3 privado com tags"
+
+Resources:
+  MeuBucketBasico:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: "cristiano-sandbox1"   # <- nome atualizado
+      AccessControl: Private
+      Tags:
+        - Key: Projeto
+          Value: SistemaX
+        - Key: Ambiente
+          Value: Dev
+
+  BucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref MeuBucketBasico
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !Sub "${MeuBucketBasico.Arn}"
+              - !Sub "${MeuBucketBasico.Arn}/*"
+            Condition:
+              Bool:
+                "aws:SecureTransport": "false"
+
+Outputs:
+  BucketName:
+    Description: "Nome do bucket S3 criado"
+    Value: !Ref MeuBucketBasico
